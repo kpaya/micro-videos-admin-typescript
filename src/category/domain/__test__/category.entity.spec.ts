@@ -1,13 +1,20 @@
+import { Uuid } from "../../../shared/value-objects/uuid.vo";
 import { Category } from "../category.entity";
 
 describe("Category Unit Test", () => {
+	let validateSpy: any;
+	
+	beforeEach(() => {
+		validateSpy = jest.spyOn(Category, "validate");
+	});
+
 	describe("constructor", () => {
 		it("should create a new Category instace with default values", () => {
 			const category = new Category({
 				name: "Category 1",
 			});
 
-			expect(category.categoryId).toBeUndefined();
+			expect(category.categoryId).toBeInstanceOf(Uuid);
 			expect(category.name).toBe("Category 1");
 			expect(category.description).toBeNull();
 			expect(category.isActive).toBe(true);
@@ -35,7 +42,7 @@ describe("Category Unit Test", () => {
 				description: "Description",
 			});
 
-			expect(category.categoryId).toBeUndefined();
+			expect(category.categoryId).toBeInstanceOf(Uuid);
 			expect(category.name).toBe("Category 1");
 			expect(category.description).toBe("Description");
 			expect(category.isActive).toBe(true);
@@ -44,7 +51,7 @@ describe("Category Unit Test", () => {
 
 	describe("methods", () => {
 		it("should update the category name", () => {
-			const category = new Category({
+			const category = Category.create({
 				name: "Category 1",
 			});
 
@@ -52,10 +59,11 @@ describe("Category Unit Test", () => {
 
 			category.changeName("Novo nome");
 			expect(category.name).toBe("Novo nome");
+			expect(validateSpy).toHaveBeenCalledTimes(2);
 		});
 
 		it("should update the category description", () => {
-			const category = new Category({
+			const category = Category.create({
 				name: "Category 1",
 			});
 
@@ -63,26 +71,29 @@ describe("Category Unit Test", () => {
 
 			category.changeDescription("Description");
 			expect(category.description).toBe("Description");
+			expect(validateSpy).toHaveBeenCalledTimes(2);
 		});
 
 		it("should activate the category", () => {
-			const category = new Category({
+			const category = Category.create({
 				name: "Category 1",
 				isActive: false,
 			});
 
 			category.activate();
 			expect(category.isActive).toBe(true);
+			expect(validateSpy).toHaveBeenCalledTimes(1);
 		});
 
 		it("should deactivate the category", () => {
-			const category = new Category({
+			const category = Category.create({
 				name: "Category 1",
 				isActive: true,
 			});
 
 			category.deactivate();
 			expect(category.isActive).toBe(false);
+			expect(validateSpy).toHaveBeenCalledTimes(1);
 		});
 
 		it("should return json representation of the category", () => {
@@ -95,7 +106,7 @@ describe("Category Unit Test", () => {
 			});
 
 			expect(category.toJSON()).toEqual({
-				categoryId: undefined,
+				categoryId: category.categoryId.id,
 				name: "Category 1",
 				description: "Description",
 				isActive: false,
